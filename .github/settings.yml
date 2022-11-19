@@ -2,8 +2,8 @@
 _extends: .github
 
 repository:
-  description: ":art: My base blueprint."
-  topics: "ivank, blueprint, accelerator, base"
+  description: ":art: Golang examples for aws sdk ."
+  topics: "ivank, go, aws, iam"
   private: false
   has_issues: true
   has_projects: false
