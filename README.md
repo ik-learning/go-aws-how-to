@@ -26,6 +26,7 @@ ARGS=--show-sts mk run
 ARGS=--list-roles mk run
 ARGS=--create-role mk run
 ARGS=--delete-role mk run
+ARGS=--attach-inline mk run
 ```
 
 ## Resources

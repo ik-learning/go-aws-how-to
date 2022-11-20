@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	var isListRoles, isSts, isCreateRole, isDeleteRole bool
+	var isListRoles, isSts, isCreateRole, isDeleteRole, isAttachInlinePolicies bool
 
 	flags := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	flags.Usage = func() {
@@ -22,6 +22,7 @@ func main() {
 	flags.BoolVar(&isListRoles, "list-roles", false, "AWS IAM list all roles.")
 	flags.BoolVar(&isCreateRole, "create-role", false, "AWS IAM create role.")
 	flags.BoolVar(&isDeleteRole, "delete-role", false, "AWS IAM delete role.")
+	flags.BoolVar(&isAttachInlinePolicies, "attach-inline", false, "AWS IAM attach inline policies to a role.")
 	flags.BoolVar(&isSts, "show-sts", false, "Show STS config.")
 
 	_ = flags.Parse(os.Args[0:])
@@ -44,6 +45,10 @@ func main() {
 
 	if isDeleteRole {
 		cmp.DeleteRole()
+	}
+
+	if isAttachInlinePolicies {
+		cmp.AttachInlinePolicies()
 	}
 
 	if isSts {

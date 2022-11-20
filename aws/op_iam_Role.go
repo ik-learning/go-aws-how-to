@@ -12,11 +12,15 @@ import (
 )
 
 const (
-	ExampleRoleName       = "ik-golang-example-role"
-	ExamplePolicyARN      = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
-	ExampleSLRService     = "elasticbeanstalk.amazonaws.com"
-	ExampleSLRDescription = "SLR for Amazon Elastic Beanstalk"
-	ExamplePolicyName     = "myTable-AccessPolicy"
+	ExampleRoleName   = "ik-golang-example-role"
+	ExamplePolicyARN  = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+	ExampleSLRService = "elasticbeanstalk.amazonaws.com"
+)
+
+var (
+	ExampleInlinePoliciesV1 = map[string]string{
+		"s3-inline-policy": ExampleS3Policy,
+	}
 )
 
 func (cmp Compute) CreateRole() {
@@ -52,7 +56,30 @@ func (cmp Compute) CreateRole() {
 		}
 		internal.OutputColorizedMessage("green", "✅ Role Created")
 		internal.OutputColorizedMessage("green", fmt.Sprintf("Account:: %s.", *role.Role.Arn))
-		//snippet-end:[iam.go-v2.CreateRole]
+		// snippet-end:[iam.go-v2.CreateRole]
+	}
+}
+
+func (cmp Compute) AttachInlinePolicies() {
+	service := iam.NewFromConfig(cmp.Config)
+	getRole, err := service.GetRole(context.Background(), &iam.GetRoleInput{
+		RoleName: aws.String(ExampleRoleName),
+	})
+	if err != nil {
+		internal.CheckError(fmt.Sprintf("Role (%s) not found.", ExampleRoleName), err)
+	}
+	if getRole != nil {
+    for name, doc := range ExampleInlinePoliciesV1 {
+        _, err = service.PutRolePolicy(context.Background(), &iam.PutRolePolicyInput{
+          RoleName: aws.String(ExampleRoleName),
+          PolicyName: aws.String(name),
+          PolicyDocument: aws.String(doc),
+        })
+        if err != nil {
+          internal.CheckError(fmt.Sprintf("Role (%s) inline policy not attached.", ExampleRoleName), err)
+        }
+    }
+		internal.OutputColorizedMessage("green", fmt.Sprintf("Inline policies attached to role (%s).", ExampleRoleName))
 	}
 }
 
