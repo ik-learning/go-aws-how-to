@@ -1,12 +1,10 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/config"
 	flag "github.com/spf13/pflag"
 
 	legacy "awshowto/aws"
@@ -32,10 +30,7 @@ func main() {
 		return
 	}
 
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-	CheckError("Error: failed to call", err)
-
-	cmp := legacy.New(cfg)
+	cmp := legacy.New()
 
 	if isListRoles {
 		print("INSIDE LIST ROLES")
