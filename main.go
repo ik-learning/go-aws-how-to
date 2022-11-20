@@ -12,14 +12,15 @@ import (
 )
 
 func main() {
-	var isListRoles, isSts bool
+	var isListRoles, isSts, isCreateRole bool
 
 	flags := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	flags.Usage = func() {
 		printHelp(flags)
 	}
 
-	flags.BoolVar(&isListRoles, "list-roles", false, "List all AWS IAM roles.")
+	flags.BoolVar(&isListRoles, "list-roles", false, "AWS IAM list all roles.")
+	flags.BoolVar(&isListRoles, "create-role", false, "AWS IAM create roles.")
 	flags.BoolVar(&isSts, "show-sts", false, "Show STS config.")
 
 	_ = flags.Parse(os.Args[0:])
@@ -34,6 +35,10 @@ func main() {
 
 	if isListRoles {
 		cmp.ListRoles()
+	}
+
+	if isCreateRole {
+		cmp.CreateRole()
 	}
 
 	if isSts {

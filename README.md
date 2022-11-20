@@ -22,8 +22,9 @@ Go AWS learn and examples.
 ## Commands
 
 ```sh
-ARGS=--list-roles mk run
 ARGS=--show-sts mk run
+ARGS=--list-roles mk run
+ARGS=--create-roles mk run
 ```
 
 ## Resources

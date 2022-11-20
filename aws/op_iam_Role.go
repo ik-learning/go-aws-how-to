@@ -6,9 +6,49 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	_ "github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/aws/aws-sdk-go/aws"
 
 	"awshowto/internal"
 )
+
+const (
+	ExampleRoleName       = "ik-golang-example-role"
+	ExamplePolicyARN      = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+	ExampleSLRService     = "elasticbeanstalk.amazonaws.com"
+	ExampleSLRDescription = "SLR for Amazon Elastic Beanstalk"
+	ExamplePolicyName     = "myTable-AccessPolicy"
+)
+
+func (cmp Compute) CreateRole() {
+	service := iam.NewFromConfig(cmp.Config)
+	// snippet-start:[iam.go-v2.CreateRole]
+	// CreateRole
+	role, err := service.CreateRole(context.Background(), &iam.CreateRoleInput{
+		RoleName:    aws.String(ExampleRoleName),
+		Description: aws.String("My super awesome example role"),
+		AssumeRolePolicyDocument: aws.String(`{
+			"Version": "2012-10-17",
+			"Statement": [
+			{
+        "Sid": "EC2AssumeRole",
+				"Effect": "Allow",
+				"Principal": {
+					"Service": "ec2.amazonaws.com"
+				},
+					"Action": "sts:AssumeRole"
+				}
+			]
+		}`),
+	})
+	if err != nil {
+		internal.CheckError("Couldn't create role.", err)
+	}
+	fmt.Println("☑️ Role Created")
+	fmt.Printf("The new role's ARN is %s \n", *role.Role.Arn)
+	//snippet-end:[iam.go-v2.CreateRole]
+}
+
+// delete role
 
 func (cmp Compute) ListRoles() {
 	service := iam.NewFromConfig(cmp.Config)
