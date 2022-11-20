@@ -18,9 +18,16 @@ const (
 )
 
 var (
-	ExampleInlinePoliciesV1 = map[string]string{
-		"s3-inline-policy": ExampleS3Policy,
-	}
+  ExampleInlinePoliciesV1List = []InlinePolicy{
+    {Key: "s3-inline-policy", Value: ExampleS3Policy},
+  }
+  ExampleInlinePoliciesV2List = []InlinePolicy{
+    {Key: "dynamodb-inline-policy", Value: ExampleDynamoDbPolicy},
+    {Key: "ses-inline-policy", Value: ExampleSesPolicy},
+  }
+  ExampleInlinePoliciesV3List = []InlinePolicy{
+    {Key: "ses-inline-policy", Value: ExampleSesPolicy},
+  }
 )
 
 func (cmp Compute) CreateRole() {
@@ -69,15 +76,15 @@ func (cmp Compute) AttachInlinePolicies() {
 		internal.CheckError(fmt.Sprintf("Role (%s) not found.", ExampleRoleName), err)
 	}
 	if getRole != nil {
-    for name, doc := range ExampleInlinePoliciesV1 {
-        _, err = service.PutRolePolicy(context.Background(), &iam.PutRolePolicyInput{
-          RoleName: aws.String(ExampleRoleName),
-          PolicyName: aws.String(name),
-          PolicyDocument: aws.String(doc),
-        })
-        if err != nil {
-          internal.CheckError(fmt.Sprintf("Role (%s) inline policy not attached.", ExampleRoleName), err)
-        }
+    for _, policy := range ExampleInlinePoliciesV1List {
+      _, err = service.PutRolePolicy(context.Background(), &iam.PutRolePolicyInput{
+        RoleName: aws.String(ExampleRoleName),
+        PolicyName: aws.String(policy.Key),
+        PolicyDocument: aws.String(policy.Value),
+      })
+      if err != nil {
+        internal.CheckError(fmt.Sprintf("Role (%s) inline policy not attached.", ExampleRoleName), err)
+      }
     }
 		internal.OutputColorizedMessage("green", fmt.Sprintf("Inline policies attached to role (%s).", ExampleRoleName))
 	}
