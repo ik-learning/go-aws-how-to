@@ -1,6 +1,6 @@
 # Go AWS Examples
 
----
+Go AWS learn and examples.
 
 ---
 
@@ -19,7 +19,10 @@
 
 ---
 
-## Create
+## Commands
 
-[**Create a repository using this template →**][template.generate]
+```sh
+ARGS=--list-roles mk run
+ARGS=--show-sts mk run
+```
 

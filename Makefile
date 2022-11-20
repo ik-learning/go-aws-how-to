@@ -23,6 +23,8 @@ validate: ## Validate files with pre-commit hooks
 
 deps: ## Update dependencies
 	@go mod tidy -v
+
+diff: ## Show diff
 	@git diff HEAD
 	@git diff-index --quiet HEAD
 
