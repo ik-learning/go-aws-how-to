@@ -33,12 +33,12 @@ func main() {
 	cmp := legacy.New()
 
 	if isListRoles {
-		print("INSIDE LIST ROLES")
+		cmp.ListRoles()
 	}
 
 	if isSts {
 		acc, err := cmp.AccountAnalyzer()
-		CheckError("iam", err)
+		CheckError("sts", err)
 		OutputColorizedMessage("blue", fmt.Sprintf("\tAccount:: %s. Aliases: %s\n", acc.Account, acc.Aliases))
 	}
 

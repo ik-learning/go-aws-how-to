@@ -26,3 +26,6 @@ ARGS=--list-roles mk run
 ARGS=--show-sts mk run
 ```
 
+## Resources
+
+- [Role Examples](https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/gov2/iam/common/examples.go)
