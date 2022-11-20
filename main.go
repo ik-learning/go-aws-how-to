@@ -20,7 +20,7 @@ func main() {
 	}
 
 	flags.BoolVar(&isListRoles, "list-roles", false, "AWS IAM list all roles.")
-	flags.BoolVar(&isListRoles, "create-role", false, "AWS IAM create roles.")
+	flags.BoolVar(&isCreateRole, "create-role", false, "AWS IAM create roles.")
 	flags.BoolVar(&isSts, "show-sts", false, "Show STS config.")
 
 	_ = flags.Parse(os.Args[0:])

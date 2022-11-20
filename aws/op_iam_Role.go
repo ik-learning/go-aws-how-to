@@ -21,31 +21,39 @@ const (
 
 func (cmp Compute) CreateRole() {
 	service := iam.NewFromConfig(cmp.Config)
-	// snippet-start:[iam.go-v2.CreateRole]
-	// CreateRole
-	role, err := service.CreateRole(context.Background(), &iam.CreateRoleInput{
-		RoleName:    aws.String(ExampleRoleName),
-		Description: aws.String("My super awesome example role"),
-		AssumeRolePolicyDocument: aws.String(`{
-			"Version": "2012-10-17",
-			"Statement": [
-			{
-        "Sid": "EC2AssumeRole",
-				"Effect": "Allow",
-				"Principal": {
-					"Service": "ec2.amazonaws.com"
-				},
-					"Action": "sts:AssumeRole"
-				}
-			]
-		}`),
+  getRole, err := service.GetRole(context.Background(), &iam.GetRoleInput{
+		RoleName: aws.String(ExampleRoleName),
 	})
-	if err != nil {
-		internal.CheckError("Couldn't create role.", err)
-	}
-	fmt.Println("☑️ Role Created")
-	fmt.Printf("The new role's ARN is %s \n", *role.Role.Arn)
-	//snippet-end:[iam.go-v2.CreateRole]
+  if getRole != nil {
+    internal.ExitErrorf(fmt.Sprintf("Role found!!!. role arn: %s.", *getRole.Role.Arn))
+  }
+  if err != nil {
+    // snippet-start:[iam.go-v2.CreateRole]
+    // CreateRole
+    role, err := service.CreateRole(context.Background(), &iam.CreateRoleInput{
+      RoleName:    aws.String(ExampleRoleName),
+      Description: aws.String("My super awesome example role"),
+      AssumeRolePolicyDocument: aws.String(`{
+        "Version": "2012-10-17",
+        "Statement": [
+        {
+          "Sid": "EC2AssumeRole",
+          "Effect": "Allow",
+          "Principal": {
+            "Service": "ec2.amazonaws.com"
+          },
+            "Action": "sts:AssumeRole"
+          }
+        ]
+      }`),
+    })
+    if err != nil {
+      internal.CheckError("Couldn't create role.", err)
+    }
+    internal.OutputColorizedMessage("green", "\t✅ Role Created")
+    internal.OutputColorizedMessage("green", fmt.Sprintf("\tAccount:: %s.", *role.Role.Arn))
+    //snippet-end:[iam.go-v2.CreateRole]
+  }
 }
 
 // delete role

@@ -36,17 +36,21 @@ func CheckError(message string, err error) {
 }
 
 func ExitErrorf(msg string, args ...interface{}) {
-	_, _ = fmt.Fprint(os.Stderr, color.RedString("❌  %s: %s\n", msg, args))
+  if args == nil {
+    _, _ = fmt.Fprint(os.Stderr, color.RedString("\t❌ %s\n", msg))
+  } else {
+    _, _ = fmt.Fprint(os.Stderr, color.RedString("\t❌ %s\n\t %s\n", msg, args))
+  }
 	os.Exit(1)
 }
 
 func OutputColorizedMessage(clr string, message string) {
 	switch clr {
 	case "blue":
-		_, _ = fmt.Fprint(os.Stdout, color.BlueString(message))
+		_, _ = fmt.Fprint(os.Stdout, color.BlueString(fmt.Sprintf("%s\n",message)))
 	case "green":
-		_, _ = fmt.Fprint(os.Stdout, color.GreenString(message))
+		_, _ = fmt.Fprint(os.Stdout, color.GreenString(fmt.Sprintf("%s\n",message)))
 	default:
-		_, _ = fmt.Fprint(os.Stdout, color.HiRedString(message))
+		_, _ = fmt.Fprint(os.Stdout, color.HiRedString(fmt.Sprintf("%s\n",message)))
 	}
 }
