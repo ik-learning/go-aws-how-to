@@ -21,19 +21,19 @@ const (
 
 func (cmp Compute) CreateRole() {
 	service := iam.NewFromConfig(cmp.Config)
-  getRole, err := service.GetRole(context.Background(), &iam.GetRoleInput{
+	getRole, err := service.GetRole(context.Background(), &iam.GetRoleInput{
 		RoleName: aws.String(ExampleRoleName),
 	})
-  if getRole != nil {
-    internal.ExitErrorf(fmt.Sprintf("Role found!!!. role arn: %s.", *getRole.Role.Arn))
-  }
-  if err != nil {
-    // snippet-start:[iam.go-v2.CreateRole]
-    // CreateRole
-    role, err := service.CreateRole(context.Background(), &iam.CreateRoleInput{
-      RoleName:    aws.String(ExampleRoleName),
-      Description: aws.String("My super awesome example role"),
-      AssumeRolePolicyDocument: aws.String(`{
+	if getRole != nil {
+		internal.ExitErrorf(fmt.Sprintf("Role found!!!. role arn: %s.", *getRole.Role.Arn))
+	}
+	if err != nil {
+		// snippet-start:[iam.go-v2.CreateRole]
+		// CreateRole
+		role, err := service.CreateRole(context.Background(), &iam.CreateRoleInput{
+			RoleName:    aws.String(ExampleRoleName),
+			Description: aws.String("My super awesome example role"),
+			AssumeRolePolicyDocument: aws.String(`{
         "Version": "2012-10-17",
         "Statement": [
         {
@@ -46,17 +46,32 @@ func (cmp Compute) CreateRole() {
           }
         ]
       }`),
-    })
-    if err != nil {
-      internal.CheckError("Couldn't create role.", err)
-    }
-    internal.OutputColorizedMessage("green", "\t✅ Role Created")
-    internal.OutputColorizedMessage("green", fmt.Sprintf("\tAccount:: %s.", *role.Role.Arn))
-    //snippet-end:[iam.go-v2.CreateRole]
-  }
+		})
+		if err != nil {
+			internal.CheckError("Couldn't create role.", err)
+		}
+		internal.OutputColorizedMessage("green", "✅ Role Created")
+		internal.OutputColorizedMessage("green", fmt.Sprintf("Account:: %s.", *role.Role.Arn))
+		//snippet-end:[iam.go-v2.CreateRole]
+	}
 }
 
-// delete role
+func (cmp Compute) DeleteRole() {
+	service := iam.NewFromConfig(cmp.Config)
+	getRole, err := service.GetRole(context.Background(), &iam.GetRoleInput{
+		RoleName: aws.String(ExampleRoleName),
+	})
+	if err != nil {
+		internal.CheckError(fmt.Sprintf("Role (%s) not found.", ExampleRoleName), err)
+	}
+	if getRole != nil {
+		_, err = service.DeleteRole(context.Background(), &iam.DeleteRoleInput{
+			RoleName: aws.String(ExampleRoleName),
+		})
+		internal.CheckError(fmt.Sprintf("FAILED > Role (%s) deletion.", ExampleRoleName), err)
+		internal.OutputColorizedMessage("green", fmt.Sprintf("✅ SUCCESS > Role (%s) deleted.", ExampleRoleName))
+	}
+}
 
 func (cmp Compute) ListRoles() {
 	service := iam.NewFromConfig(cmp.Config)
