@@ -50,6 +50,8 @@ func OutputColorizedMessage(clr string, message string) {
 		_, _ = fmt.Fprint(os.Stdout, color.BlueString(fmt.Sprintf("\t%s\n", message)))
 	case "green":
 		_, _ = fmt.Fprint(os.Stdout, color.GreenString(fmt.Sprintf("\t%s\n", message)))
+  case "yellow":
+		_, _ = fmt.Fprint(os.Stdout, color.YellowString(fmt.Sprintf("\t%s\n", message)))
 	default:
 		_, _ = fmt.Fprint(os.Stdout, color.HiRedString(fmt.Sprintf("\t%s\n", message)))
 	}

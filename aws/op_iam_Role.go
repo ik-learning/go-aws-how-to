@@ -28,6 +28,8 @@ var (
   ExampleInlinePoliciesV3List = []InlinePolicy{
     {Key: "ses-inline-policy", Value: ExampleSesPolicy},
   }
+
+  ExampleInlinePoliciesList = ExampleInlinePoliciesV1List
 )
 
 func (cmp Compute) CreateRole() {
@@ -67,6 +69,12 @@ func (cmp Compute) CreateRole() {
   }
 }
 
+// Attach and Removes the specified managed policy from the specified role. A role can also
+// have inline policies embedded with it. To delete an inline policy, use
+// DeleteRolePolicy. For information about policies, see Managed policies and
+// inline policies
+// (https://docs.aws.amazon.com/IAM/latest/UserGuide/policies-managed-vs-inline.html)
+// in the IAM User Guide.
 func (cmp Compute) AttachInlinePolicies() {
   service := iam.NewFromConfig(cmp.Config)
   getRole, err := service.GetRole(context.Background(), &iam.GetRoleInput{
@@ -75,17 +83,45 @@ func (cmp Compute) AttachInlinePolicies() {
   if err != nil {
     internal.CheckError(fmt.Sprintf("Role (%s) not found.", ExampleRoleName), err)
   }
-  
+
   if getRole != nil {
-    for _, policy := range ExampleInlinePoliciesV1List {
+    // fmt.Println(rolePoliciesList)
+    currentPolicies := map[string]struct{}{}
+    // delete policy that no longer exist
+    for _, policy := range ExampleInlinePoliciesList {
+      currentPolicies[policy.Key] = struct{}{}
+    }
+
+    rolePoliciesList, err := service.ListRolePolicies(context.Background(), &iam.ListRolePoliciesInput{
+      RoleName: aws.String(ExampleRoleName),
+    })
+    internal.CheckError(fmt.Sprintf("Role (%s) inline policy not attached.", ExampleRoleName), err)
+
+    toDeletePolicies := map[string]struct{}{}
+    for _, policy := range rolePoliciesList.PolicyNames {
+      if _, ok := currentPolicies[policy]; !ok {
+        internal.OutputColorizedMessage("yellow", fmt.Sprintf("Inline policy (%s) should not be attached.", policy))
+        toDeletePolicies[policy] = struct{}{}
+      }
+    }
+
+    for policy := range toDeletePolicies {
+      _, err := service.DeleteRolePolicy(context.TODO(), &iam.DeleteRolePolicyInput{
+        PolicyName: aws.String(policy),
+        RoleName: aws.String(ExampleRoleName),
+      })
+      internal.CheckError(fmt.Sprintf("Inline policy (%s) not detached.", policy), err)
+      internal.OutputColorizedMessage("green", fmt.Sprintf("Inline policy detached (%s).", policy))
+    }
+
+    // add|update
+    for _, policy := range ExampleInlinePoliciesList {
       _, err = service.PutRolePolicy(context.Background(), &iam.PutRolePolicyInput{
         RoleName:       aws.String(ExampleRoleName),
         PolicyName:     aws.String(policy.Key),
         PolicyDocument: aws.String(policy.Value),
       })
-      if err != nil {
-        internal.CheckError(fmt.Sprintf("Role (%s) inline policy not attached.", ExampleRoleName), err)
-      }
+      internal.CheckError(fmt.Sprintf("Role (%s) inline policy not attached.", ExampleRoleName), err)
     }
     internal.OutputColorizedMessage("green", fmt.Sprintf("Inline policies attached to role (%s).", ExampleRoleName))
   }
